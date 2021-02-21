@@ -1,0 +1,1 @@
+web:cross-env UMI_ENV=dev umi dev
