@@ -1,13 +1,13 @@
-export const pickTeachers = ({ studentId, listTeacher, listSubject }) => {
+export const pickTeachers = ({ studentId, listTeachers }) => {
   return {
-    type: 'subject/pickTeachers',
-    payload: { studentId, listTeacher, listSubject },
+    type: 'pickTeacher/pickTeachers',
+    payload: { studentId, listTeachers },
   };
 };
 
 export const getAssignedTeachers = ({ studentId }) => {
   return {
-    type: 'subject/getAssignedTeachers',
+    type: 'pickTeacher/getAssignedTeachers',
     payload: studentId,
   };
 };

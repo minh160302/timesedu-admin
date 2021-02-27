@@ -4,13 +4,13 @@ import { Button } from "antd"
 import { connect } from "umi"
 
 const Availability = (props) => {
-  const { profile } = props
+  const { teacher } = props
 
 
   const [schedule, setSchedule] = useState([])
 
   useEffect(() => {
-    let rawTime = { ...profile.raw_time_data }
+    let rawTime = { ...teacher.raw_time_data }
 
     for (let time in rawTime) {
       setSchedule((prevArray) => [
@@ -19,7 +19,7 @@ const Availability = (props) => {
       ])
     }
 
-  }, [profile.raw_time_data])
+  }, [teacher.raw_time_data])
 
 
   return (
@@ -40,7 +40,7 @@ const Availability = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    profile: state.studentProfile.profile
+    teacher: state.teacher.teacher
   }
 }
 

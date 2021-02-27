@@ -1,8 +1,9 @@
 import { message } from 'antd';
 import { pickTeachersService, getAssignedTeachers } from './service';
+import { getTeacherByIdService } from '../teacher-profile/service';
 
 const Model = {
-  namespace: 'subject',
+  namespace: 'pickTeacher',
   state: {
     listTeachers: [],
   },
@@ -21,8 +22,8 @@ const Model = {
 
       yield put({
         type: 'getAssignedTeachersReducer',
-        payload: data
-      })
+        payload: data,
+      });
     },
   },
   reducers: {
@@ -35,9 +36,9 @@ const Model = {
     getAssignedTeachersReducer(state, action) {
       return {
         ...state,
-        listTeachers: action.payload
-      }
-    }
+        listTeachers: action.payload,
+      };
+    },
   },
 };
 

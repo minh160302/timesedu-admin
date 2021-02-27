@@ -47,7 +47,12 @@ export default [
             path: '/admin/profile/student/*',
             name: 'Student Profile',
             component: "./Admin/profile/student-profile"
-          }
+          },
+          {
+            path: '/admin/profile/teacher/*',
+            name: 'Teacher Profile',
+            component: "./Admin/profile/teacher-profile"
+          },
         ]
       }
     ]

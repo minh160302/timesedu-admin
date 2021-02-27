@@ -3,7 +3,7 @@ import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from "./routes"
-// const { REACT_APP_ENV } = process.env;
+const { REACT_APP_ENV } = process.env;
 export default defineConfig({
   hash: true,
   antd: {},
@@ -11,7 +11,7 @@ export default defineConfig({
     hmr: true,
   },
   history: {
-    type: 'hash',
+    type: 'browser',//hash
   },
   locale: {
     // default zh-CN
@@ -35,7 +35,7 @@ export default defineConfig({
   routes,
   title: false,
   ignoreMomentLocale: true,
-  proxy: proxy['site' || 'dev'],
+  proxy: proxy[REACT_APP_ENV || 'dev'],
   manifest: {
     basePath: '/admin',
   },

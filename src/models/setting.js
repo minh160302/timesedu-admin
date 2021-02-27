@@ -10,7 +10,22 @@ const updateColorWeak = (colorWeak) => {
 
 const SettingModel = {
   namespace: 'settings',
-  state: defaultSettings,
+  state: {
+    "navTheme": "dark",
+    "primaryColor": "#1890ff",
+    "layout": "top",
+    "contentWidth": "Fluid",
+    "fixedHeader": false,
+    "fixSiderbar": true,
+    "title": "ADMIN",
+    "pwa": false,
+    "iconfontUrl": "",
+    "menu": {
+      "locale": true
+    },
+    "headerHeight": 48,
+    "splitMenus": false
+  },
   reducers: {
     changeSetting(state = defaultSettings, { payload }) {
       const { colorWeak, contentWidth } = payload;
@@ -25,3 +40,4 @@ const SettingModel = {
   },
 };
 export default SettingModel;
+

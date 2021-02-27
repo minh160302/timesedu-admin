@@ -100,7 +100,7 @@ const TableList = () => {
         <Space size="middle">
           <a onClick={() => {
             console.log(record.id)
-            // history.push("/admin/")
+            history.push(`/admin/profile/teacher/${record.id}`)
           }}>View details</a>
         </Space>
       ),

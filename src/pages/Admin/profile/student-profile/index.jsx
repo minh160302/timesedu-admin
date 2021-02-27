@@ -1,7 +1,4 @@
 import {
-  DingdingOutlined,
-  DownOutlined,
-  EllipsisOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
@@ -28,16 +25,17 @@ import { getStudentProfileById, generateTeachers } from "../../list/student-list
 import Availability from "./components/Availability"
 import StudentDemand from "./components/StudentDemand"
 import { pickTeachers, getAssignedTeachers } from "./actions"
+import { getTeacherById } from "../teacher-profile/actions"
+import ScheduleSelector from 'react-schedule-selector';
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse
 
 const StudentProfile = (props) => {
   const [selectedRowsState, setSelectedRows] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState("")
+  const [selectedSubject, setSelectedSubject] = useState([])
 
   const [pickedTeachers, setPickedTeachers] = useState([])
-  const [pickedSubject, setPickedSubject] = useState([])
 
 
   const { profile } = props
@@ -47,11 +45,44 @@ const StudentProfile = (props) => {
     props.getStudentProfileById({ id: studentId })
     props.generateTeachers({ id: studentId })
     props.getAssignedTeachers({ studentId })
+    setPickedTeachers(props.listTeachers)
+    props.listTeachers?.map((teacher) => {
+      setSelectedSubject((prevArr) => [...prevArr, teacher.subject])
+    })
   }, [])
 
   useEffect(() => {
     setPickedTeachers(props.listTeachers)
+    props.listTeachers?.map((teacher) => {
+      setSelectedSubject((prevArr) => [...prevArr, teacher.subject])
+    })
   }, [props.listTeachers])
+
+  const renderTagColor = (subject) => {
+    let color = 'geekblue';
+    switch (subject) {
+      case 'cap1':
+        color = 'green'
+        break;
+      case 'cap2':
+        color = 'geekblue'
+        break;
+      case 'cap3':
+        color = 'orange'
+        break;
+      case 'ielts':
+        color = 'volcano'
+        break;
+      case 'toefl':
+        color = 'purple'
+        break;
+
+      default:
+        break;
+    }
+
+    return color
+  }
 
   const description = (
     <RouteContext.Consumer>
@@ -66,7 +97,7 @@ const StudentProfile = (props) => {
           </Descriptions.Item>
           <Descriptions.Item label="Description">Description goes here</Descriptions.Item>
           <Descriptions.Item label="Availability">
-            <Availability time={profile.free_time} />
+            <Availability />
           </Descriptions.Item>
         </Descriptions>
       )}
@@ -106,28 +137,7 @@ const StudentProfile = (props) => {
       render: tags => (
         <>
           {tags.map(tag => {
-            let color = 'geekblue';
-            //  : 'green';
-
-            switch (tag) {
-              case 'cap1':
-                color = 'green'
-                break;
-              case 'cap2':
-                color = 'geekblue'
-                break;
-              case 'cap3':
-                color = 'orange'
-                break;
-              case 'ielts':
-                color = 'volcano'
-                break;
-              case 'toefl':
-                color = 'purple'
-                break;
-              default:
-                break;
-            }
+            let color = renderTagColor(tag)
             return (
               <Tag draggable color={color} key={tag}>
                 {tag.toUpperCase()}
@@ -158,139 +168,157 @@ const StudentProfile = (props) => {
       className={styles.pageHeader}
       content={description}
     >
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Detail" key="1">
-          <div className={styles.main} tabIndex={0}>
-            <GridContent>
-              <Card
-                title="List Teachers"
-                style={{
-                  marginBottom: 24,
-                }}
-                bordered={false}
-              >
-                <Table
-                  dataSource={dataSource}
-                  columns={columns}
-                  rowSelection={{
-                    type: "radio",
-                    onChange: (_, selectedRows) => {
-                      setSelectedRows(selectedRows);
-                    },
-                    getCheckboxProps: () => ({
-                      disabled: pickedTeachers.length === profile.demand?.length, // Column configuration not to be checked
-                    }),
-                  }} />
+      <Tabs defaultActiveKey="0">
 
-                <Divider>
-                  <span>Pick teacher for the subjects below</span>
-                  <Tooltip title="pick 1 and submit respectively">
-                    <InfoCircleOutlined
-                      style={{
-                        marginRight: 4,
-                        marginLeft: 4
-                      }}
-                    />
-                  </Tooltip>
-                </Divider>
-                <Card className={styles.teacherPicker}>
-                  {profile.demand?.map(tag => {
-                    let color = 'geekblue';
-                    //  : 'green';
+        {profile.demand?.map((subject, subjectIndex) => {
+          let teachersBySubject = dataSource?.filter(teacher => teacher.professions.includes(subject))
+          let color = renderTagColor(subject)
+          return (
+            <TabPane tab={subject} key={subjectIndex}>
+              <div className={styles.main}>
+                <GridContent>
+                  <Card
+                    title={`List Teachers for ${subject}`}
+                    style={{
+                      marginBottom: 24,
+                    }}
+                    bordered={false}
+                  >
+                    <Table
+                      dataSource={teachersBySubject}
+                      columns={columns}
+                      rowSelection={{
+                        type: "radio",
+                        onChange: (_, selectedRows) => {
+                          setSelectedRows(selectedRows);
+                        },
+                        getCheckboxProps: () => ({
+                          disabled: pickedTeachers.length === profile.demand?.length, // Column configuration not to be checked
+                        }),
+                      }} />
+                  </Card>
+                </GridContent>
+              </div>
 
-                    switch (tag) {
-                      case 'cap1':
-                        color = 'green'
-                        break;
-                      case 'cap2':
-                        color = 'geekblue'
-                        break;
-                      case 'cap3':
-                        color = 'orange'
-                        break;
-                      case 'ielts':
-                        color = 'volcano'
-                        break;
-                      case 'toefl':
-                        color = 'purple'
-                        break;
+              <Divider>
+                <span>Pick your {subject} teacher</span>
+                <Tooltip title="You can only pick 1 teacher for each subject">
+                  <InfoCircleOutlined
+                    style={{
+                      marginRight: 4,
+                      marginLeft: 4
+                    }}
+                  />
+                </Tooltip>
+              </Divider>
 
-                      default:
-                        break;
+              <Card className={styles.teacherPicker}>
+                <Tag
+                  visible={selectedRowsState.length > 0 || props.listTeachers?.length > 0}
+                  draggable color={color}
+                  key={subject}
+                  onClick={() => {
+                    if (!selectedRowsState[0].professions.includes(subject)) {
+                      message.error("this teacher is incompatible")
+                      setSelectedRows([])
+                    } else {
+                      if (!selectedSubject.includes(subject)) {
+                        // add subject to each teacher in tracking student
+                        selectedRowsState[0].subject = subject
+                        setPickedTeachers((prevArr) => [...prevArr, selectedRowsState[0]])
+
+                        props.getTeacherById({ id: selectedRowsState[0].id })
+                      } else {
+                        message.error("this subject already has teacher")
+                      }
                     }
+
+                    setSelectedSubject((prevArray) => [...prevArray, subject])
+                  }} className={styles.pickTag} >
+                  {subject.toUpperCase()}
+                </Tag>
+              </Card>
+            </TabPane>
+          )
+        })}
+
+      </Tabs>
+
+
+      {pickedTeachers.length > 0 && profile.demand?.map((item, itemIndex) => {
+        if (selectedSubject.includes(item)) {
+          return (
+            <p>
+              <Card
+                key={itemIndex}
+                className={styles.pickTag}
+              >
+                {pickedTeachers.map((teacher, index) => {
+                  console.log(teacher)
+                  if (index === itemIndex) {
+                    const teacherTime = [...teacher.raw_time_data]
+                    const studentTime = [...profile.raw_time_data]
+
+                    let commonTime = teacherTime.filter(time => {
+                      return studentTime.indexOf(time) !== -1
+                    })
+
+                    let commonTimeObject = { ...commonTime }
+
+                    let convertedTime = []
+                    for (let time in commonTimeObject) {
+                      convertedTime.push(new Date(commonTimeObject[time]))
+                    }
+
                     return (
-                      <Tag
-                        visible={selectedRowsState.length > 0 || props.listTeachers?.length > 0}
-                        draggable color={color}
-                        key={tag}
-                        onClick={() => {
-                          if (!selectedRowsState[0].professions.includes(tag)) {
-                            message.error("this teacher is incompatible")
-                            setSelectedRows([])
-                          } else {
-                            if (!pickedSubject.includes(tag)) {
-                              // selectedRowsState[0].professions = tag
-                              setPickedTeachers((prevArr) => [...prevArr, selectedRowsState[0]])
-                              setPickedSubject((prevArr) => [...prevArr, tag])
-                            } else {
-                              message.error("this subject already has teacher")
-                            }
-                          }
-
-                          setSelectedSubject(tag)
-                        }} className={styles.pickTag} >
-                        {tag.toUpperCase()}
-                      </Tag>
-                    );
-                  })}
-                </Card>
-
-                {profile.demand?.map((item, itemIndex) => {
-                  return (
-                    <p>
-                      <Card className={styles.pickTag} style={selectedSubject === item || pickedTeachers.length > 0 ? { display: "block" } : { display: "none" }}>
-                        {pickedTeachers.map((teacher, index) => {
-                          if (index === itemIndex) {
-                            return (
-                              <Collapse key={teacher.key}>
-                                <Panel header={teacher.subject}>
-                                  <p>Name: {teacher.name}</p>
-                                  <p>Gender: {teacher.gender}</p>
-                                  <p>Year of birth: {teacher.dob}</p>
-                                  <p>Location: {teacher.location}</p>
-                                  <p>Distance to student's home: {teacher.distance}</p>
-                                  {/* <p>{selectedRowsState[0]}</p> */}
-                                </Panel>
-                              </Collapse>
-                            )
-                          }
-                        })}
-                      </Card>
-                    </p>
-                  )
+                      <Collapse key={teacher.key}>
+                        <Panel header={item}>
+                          <p>Name: {teacher.name}</p>
+                          <p>Gender: {teacher.gender}</p>
+                          <p>Year of birth: {teacher.dob}</p>
+                          <p>Teaching: {item}</p>
+                          <p>Location: {teacher.location}</p>
+                          <p>Distance to student's home: {teacher.distance}</p>
+                          <p>
+                            <ScheduleSelector
+                              selection={convertedTime}
+                              numDays={7}
+                              minTime={8}
+                              maxTime={22}
+                              hourlyChunks={2}
+                              startDate={new Date(2021, 2, 22)} //monday
+                              dateFormat="ddd"
+                              timeFormat="hh mm a"
+                            />
+                          </p>
+                        </Panel>
+                      </Collapse>
+                    )
+                  }
                 })}
 
-                <Button onClick={() => {
-                  // props.pickTeachers({ studentId: studentId, teacherId: selectedRowsState[0]?.id })
-                  console.log(pickedTeachers)
-                  props.pickTeachers({ studentId: studentId, listTeacher: pickedTeachers, listSubject: pickedSubject })
-                }}>Submit</Button>
-
-                <Button onClick={() => {
-                  setPickedTeachers([])
-                  setPickedSubject([])
-                }}>Reset</Button>
+                <Button>Delete</Button>
               </Card>
-            </GridContent>
-          </div>
-        </TabPane>
-        <TabPane tab="Tab 2" key="2">
-          Content of Tab Pane 2
-        </TabPane>
-        <TabPane tab="Tab 3" key="3">
-          Content of Tab Pane 3
-        </TabPane>
-      </Tabs>
+            </p>
+          )
+        }
+
+      })}
+
+      <Button
+        type="primary"
+        onClick={() => {
+          console.log(pickedTeachers)
+          props.pickTeachers({ studentId: studentId, listTeachers: pickedTeachers })
+        }}
+        disabled={props.listTeachers.length === profile.demand?.length}
+      >Submit</Button>
+
+      <Button onClick={() => {
+        setPickedTeachers([])
+        setSelectedSubject([])
+
+      }}>Delete all</Button>
 
     </PageContainer>
   );
@@ -299,7 +327,7 @@ const StudentProfile = (props) => {
 const mapStateToProps = (state) => {
   return {
     profile: state.studentProfile.profile,
-    listTeachers: state.subject.listTeachers
+    listTeachers: state.pickTeacher.listTeachers
   }
 }
 
@@ -307,7 +335,8 @@ const mapDispatchToProps = {
   getStudentProfileById,
   generateTeachers,
   pickTeachers,
-  getAssignedTeachers
+  getAssignedTeachers,
+  getTeacherById
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentProfile)

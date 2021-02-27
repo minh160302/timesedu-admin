@@ -6,7 +6,7 @@ let index = 0;
 let dividedTimeList = [[]];
 function divideTimeToStage(array) {
   for (let i = 0; i < array.length; i++) {
-    if (array[i + 1] - array[i] > 1) {
+    if (array[i + 1] - array[i] > 0.5) {
       // let array1 = [...array].splice(0, i + 1);
       dividedTimeList.push([]);
       dividedTimeList[index].push(array[i]);
@@ -37,8 +37,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -46,8 +46,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -55,8 +55,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -64,8 +64,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -73,8 +73,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -82,8 +82,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -91,12 +91,13 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
-        },
+        },      
       },
+      raw_time_data: {}
     },
   },
   effects: {
@@ -163,7 +164,14 @@ const Model = {
             break;
         }
 
-        newState.student.free_time[userFreeDay].list_time.push(value.getHours());
+        let localTime = 0
+        if(value.getMinutes() === 0){
+          localTime = value.getHours()
+        }else{
+          localTime = value.getHours() + value.getMinutes()/60
+        }
+
+        newState.student.free_time[userFreeDay].list_time.push(localTime);
         newState.student.free_time[userFreeDay].list_time.sort(function (a, b) {
           return a - b;
         });

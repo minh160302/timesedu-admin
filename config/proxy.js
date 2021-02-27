@@ -6,18 +6,9 @@
  * https://pro.ant.design/docs/deploy
  */
 export default {
-  site: {
-    '/api/': {
-      target: 'https://heroku-cminh.herokuapp.com/',
-      changeOrigin: true,
-      pathRewrite: {
-        '^': '',
-      },
-    },
-  },
   dev: {
     '/api/': {
-      target: 'https://heroku-cminh.herokuapp.com/',
+      target: 'http://localhost:8080/',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -26,7 +17,7 @@ export default {
   },
   test: {
     '/api/': {
-      target: 'https://heroku-cminh.herokuapp.com/',
+      target: 'http://localhost:8080/',
       changeOrigin: true,
       pathRewrite: {
         '^': '',

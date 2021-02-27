@@ -56,7 +56,7 @@ const TeacherForm = (props) => {
     values.free_time = props.teacher.free_time
     values.gender = values.gender[0]
     values.dob = values.dob.year()
-    console.log(values)
+    values.raw_time_data = schedule
 
     props.createTeacher({ teacher: values })
 
@@ -261,11 +261,12 @@ const TeacherForm = (props) => {
               selection={schedule}
               numDays={7}
               minTime={8}
-              maxTime={21}
-              hourlyChunks={1}
+              maxTime={22}
+              hourlyChunks={2}
               onChange={handleScheduleChange}
-              startDate={Date.now()}
+              startDate={new Date(2021, 2, 22)} //monday
               dateFormat="ddd"
+              timeFormat="hh mm a"
             />
             <div className="clear-time-container">
               <Button onClick={handleScheduleClear} type="dashed" >Clear</Button>

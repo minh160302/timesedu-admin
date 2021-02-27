@@ -6,7 +6,7 @@ let index = 0;
 let dividedTimeList = [[]];
 function divideTimeToStage(array) {
   for (let i = 0; i < array.length; i++) {
-    if (array[i + 1] - array[i] > 1) {
+    if (array[i + 1] - array[i] > 0.5) {
       // let array1 = [...array].splice(0, i + 1);
       dividedTimeList.push([]);
       dividedTimeList[index].push(array[i]);
@@ -20,7 +20,7 @@ function divideTimeToStage(array) {
     }
   }
 
-  return dividedTimeList
+  return dividedTimeList;
 }
 
 const Model = {
@@ -37,8 +37,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -46,8 +46,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -55,8 +55,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -64,8 +64,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -73,8 +73,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -82,8 +82,8 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
@@ -91,16 +91,18 @@ const Model = {
           list_time: [],
           stages: [
             {
-              start_time: -1,
-              end_time: -1,
+              start_time: 0,
+              end_time: 0,
             },
           ],
         },
       },
+      raw_time_data: {},
     },
   },
   effects: {
     *createTeacher({ payload }, { call }) {
+      console.log(payload);
       yield call(createTeacherService, payload);
       message.success('success');
     },
@@ -163,7 +165,14 @@ const Model = {
             break;
         }
 
-        newState.teacher.free_time[userFreeDay].list_time.push(value.getHours());
+        let localTime = 0;
+        if (value.getMinutes() === 0) {
+          localTime = value.getHours();
+        } else {
+          localTime = value.getHours() + value.getMinutes() / 60;
+        }
+
+        newState.teacher.free_time[userFreeDay].list_time.push(localTime);
         newState.teacher.free_time[userFreeDay].list_time.sort(function (a, b) {
           return a - b;
         });
@@ -175,15 +184,15 @@ const Model = {
       for (let day in newState.teacher.free_time) {
         let listTimeByDay = [...newState.teacher.free_time[day].list_time];
         if (listTimeByDay.length >= 1) {
-          dividedTimeList = [[]]
-          index = 0
-          newState.teacher.free_time[day].stages = []
+          dividedTimeList = [[]];
+          index = 0;
+          newState.teacher.free_time[day].stages = [];
           let stages = divideTimeToStage(listTimeByDay);
-          for(let i in stages){
-            let newStage = {}
-            newStage.start_time = stages[i][0]
-            newStage.end_time = stages[i][stages[i].length - 1]
-            newState.teacher.free_time[day].stages.push(newStage)
+          for (let i in stages) {
+            let newStage = {};
+            newStage.start_time = stages[i][0];
+            newStage.end_time = stages[i][stages[i].length - 1];
+            newState.teacher.free_time[day].stages.push(newStage);
           }
         }
       }
@@ -194,8 +203,8 @@ const Model = {
       let newState = { ...state };
       for (let day in newState.teacher.free_time) {
         newState.teacher.free_time[day].list_time = [];
-        newState.teacher.free_time[day].start_time = -1;
-        newState.teacher.free_time[day].end_time = -1;
+        newState.teacher.free_time[day].start_time = 0;
+        newState.teacher.free_time[day].end_time = 0;
       }
 
       return newState;

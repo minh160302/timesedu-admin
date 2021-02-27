@@ -3,8 +3,7 @@ import request from 'umi-request';
 export async function pickTeachersService(params) {
   console.log(params)
   const reqBody = {
-    teacher_list: params.listTeacher,
-    subject_list: params.listSubject
+    teacher_list: params.listTeachers,
   }
   return request(`/api/admin/pick-teachers/${params.studentId}`, {
     method: 'POST',
