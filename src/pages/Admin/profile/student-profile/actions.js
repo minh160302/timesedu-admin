@@ -11,3 +11,10 @@ export const getAssignedTeachers = ({ studentId }) => {
     payload: studentId,
   };
 };
+
+export const pickMeetingTime = ({ subject, meetingTimes }) => {
+  return {
+    type: 'pickTeacher/pickMeetingTime',
+    payload: { subject, meetingTimes },
+  };
+};

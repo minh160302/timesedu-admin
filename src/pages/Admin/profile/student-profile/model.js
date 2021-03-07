@@ -6,9 +6,11 @@ const Model = {
   namespace: 'pickTeacher',
   state: {
     listTeachers: [],
+    meetingTimes: {},
   },
   effects: {
     *pickTeachers({ payload }, { call, put }) {
+      
       const data = yield call(pickTeachersService, payload);
       console.log(data);
       message.success('success');
@@ -25,6 +27,12 @@ const Model = {
         payload: data,
       });
     },
+    *pickMeetingTime({ payload }, { put }) {
+      yield put({
+        type: 'pickMeetingTimeReducer',
+        payload,
+      });
+    },
   },
   reducers: {
     pickTeachersReducer(state, action) {
@@ -38,6 +46,13 @@ const Model = {
         ...state,
         listTeachers: action.payload,
       };
+    },
+    pickMeetingTimeReducer(state, action) {
+      const { subject, meetingTimes } = action.payload;
+      let newState = { ...state };
+      newState.meetingTimes[subject] = meetingTimes;
+
+      return newState;
     },
   },
 };

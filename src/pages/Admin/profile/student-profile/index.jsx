@@ -8,7 +8,7 @@ import {
   Descriptions,
   Divider,
   Tooltip,
-  Empty,
+  Input,
   Table,
   Row,
   Tag,
@@ -26,17 +26,14 @@ import Availability from "./components/Availability"
 import StudentDemand from "./components/StudentDemand"
 import { pickTeachers, getAssignedTeachers } from "./actions"
 import { getTeacherById } from "../teacher-profile/actions"
-import ScheduleSelector from 'react-schedule-selector';
+import TeacherPick from "./components/TeacherPick"
 
 const { TabPane } = Tabs;
-const { Panel } = Collapse
 
 const StudentProfile = (props) => {
   const [selectedRowsState, setSelectedRows] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState([])
-
   const [pickedTeachers, setPickedTeachers] = useState([])
-
 
   const { profile } = props
   const studentId = props.location.pathname.split('/')[4]
@@ -253,62 +250,19 @@ const StudentProfile = (props) => {
                 key={itemIndex}
                 className={styles.pickTag}
               >
-                {pickedTeachers.map((teacher, index) => {
-                  console.log(teacher)
-                  if (index === itemIndex) {
-                    const teacherTime = [...teacher.raw_time_data]
-                    const studentTime = [...profile.raw_time_data]
-
-                    let commonTime = teacherTime.filter(time => {
-                      return studentTime.indexOf(time) !== -1
-                    })
-
-                    let commonTimeObject = { ...commonTime }
-
-                    let convertedTime = []
-                    for (let time in commonTimeObject) {
-                      convertedTime.push(new Date(commonTimeObject[time]))
-                    }
-
-                    return (
-                      <Collapse key={teacher.key}>
-                        <Panel header={item}>
-                          <p>Name: {teacher.name}</p>
-                          <p>Gender: {teacher.gender}</p>
-                          <p>Year of birth: {teacher.dob}</p>
-                          <p>Teaching: {item}</p>
-                          <p>Location: {teacher.location}</p>
-                          <p>Distance to student's home: {teacher.distance}</p>
-                          <p>
-                            <ScheduleSelector
-                              selection={convertedTime}
-                              numDays={7}
-                              minTime={8}
-                              maxTime={22}
-                              hourlyChunks={2}
-                              startDate={new Date(2021, 2, 22)} //monday
-                              dateFormat="ddd"
-                              timeFormat="hh mm a"
-                            />
-                          </p>
-                        </Panel>
-                      </Collapse>
-                    )
-                  }
-                })}
-
-                <Button>Delete</Button>
+                <TeacherPick listPickedTeachers={pickedTeachers} subject={item} subjectIndex={itemIndex} />
               </Card>
             </p>
           )
         }
-
       })}
 
       <Button
         type="primary"
         onClick={() => {
-          console.log(pickedTeachers)
+          pickedTeachers.map(teacher => {
+            teacher.meeting_time = props.meetingTimes[teacher.subject]
+          })
           props.pickTeachers({ studentId: studentId, listTeachers: pickedTeachers })
         }}
         disabled={props.listTeachers.length === profile.demand?.length}
@@ -327,7 +281,8 @@ const StudentProfile = (props) => {
 const mapStateToProps = (state) => {
   return {
     profile: state.studentProfile.profile,
-    listTeachers: state.pickTeacher.listTeachers
+    listTeachers: state.pickTeacher.listTeachers,
+    meetingTimes: state.pickTeacher.meetingTimes
   }
 }
 
