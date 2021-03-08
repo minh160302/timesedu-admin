@@ -63,7 +63,7 @@ const StudentForm = (props) => {
 
     setTimeout(() => {
       window.location.reload()
-    }, 500)
+    }, 1500)
   };
 
   const onFinishFailed = (errorInfo) => {
